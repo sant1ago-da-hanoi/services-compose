@@ -1,0 +1,82 @@
+version: '1.0'
+
+services:
+  laravel:
+    container_name: ${LARAVEL_CONTAINER_NAME}
+    env_file:
+      - .env
+    user: "${UID}:${GID}"
+    build:
+      context: ./app_${PHP_VERSION}
+      target: php
+      args:
+        - APP_ENV=${APP_ENV:-local}
+    environment:
+      - APP_ENV=${APP_ENV:-local}
+    working_dir: /var/www
+    volumes:
+      - ${SOURCE_PATH}/:/var/www/
+      - ./app_${PHP_VERSION}/php.ini:/usr/local/etc/php/conf.d/my-custom-php.ini
+      - ./app_${PHP_VERSION}/entrypoint.sh:/usr/local/bin/entrypoint.sh
+    ports:
+      - ${LARAVEL_FORWARDED_PORT}:8080
+    depends_on:
+      - database
+      - redis
+  nginx:
+    container_name: ${NGINX_CONTAINER_NAME}
+    build:
+      context: ./app_${PHP_VERSION}/nginx/
+      dockerfile: Dockerfile
+    working_dir: /var/www
+    restart: always
+    ports:
+      - ${NGINX_FORWARDED_PORT}:80
+      - ${NGINX_FORWARDED_PORT_SSL}:443
+    volumes:
+      - ./app_${PHP_VERSION}/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./app_${PHP_VERSION}/ssl/:/etc/nginx/ssl/
+      - ${SOURCE_PATH}/../:/var/www/
+      - ./app_${PHP_VERSION}/nginx/:/etc/nginx/conf.d/
+    depends_on:
+      - laravel
+  database:
+    container_name: mysql
+    image: mysql:${MYSQL_VERSION}
+    platform: ${MYSQL_PLATFORM}
+    ports:
+      - ${MYSQL_FORWARDED_PORT}:3306
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - "./mysql:/var/lib/mysql"
+    command: [
+        '--character-set-server=utf8mb4',
+        '--collation-server=utf8mb4_unicode_ci',
+        '--default-authentication-plugin=mysql_native_password'
+      ]
+  minio:
+    container_name: ${MINIO_CONTAINER_NAME}
+    image: minio/minio
+    restart: always
+    ports:
+      - ${MINIO_FORWARDED_PORT1}:9000
+      - ${MINIO_FORWARDED_PORT2}:9001
+    volumes:
+      - minio_storage:/data
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    command: server --console-address ":9001" /data
+  redis:
+    container_name: ${REDIS_CONTAINER_NAME}
+    image: redis:alpine
+    command: redis-server --appendonly yes --requirepass "secret"
+    ports:
+      - ${REDIS_FORWARDED_PORT}:6379
+volumes:
+  db-data: ~
+  minio_storage: {}
