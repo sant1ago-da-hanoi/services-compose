@@ -7,5 +7,5 @@
 
 ## Usage
 
-- MySQL port: `3306`
-- PHPMyAdmin port: `9090`
+- MySQL port: `whatever you configured in .env file`
+- Laravel access: `http://localhost:9999`
