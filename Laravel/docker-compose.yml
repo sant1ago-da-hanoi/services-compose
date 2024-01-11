@@ -1,4 +1,4 @@
-version: '1.0'
+version: '3.8'
 
 services:
   laravel:
@@ -41,7 +41,7 @@ services:
     depends_on:
       - laravel
   database:
-    container_name: mysql
+    container_name: ${MYSQL_CONTAINER_NAME}
     image: mysql:${MYSQL_VERSION}
     platform: ${MYSQL_PLATFORM}
     ports:
