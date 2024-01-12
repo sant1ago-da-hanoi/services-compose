@@ -27,7 +27,7 @@ chsh -s $(which zsh)
 # Install powerlevel10k
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 cp ~/.zshrc ~/.zshrc.bak
-echo 'source $HOME/powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
+echo ZSH_THEME="powerlevel10k/powerlevel10k" >>~/.zshrc
 source ~/.zshrc
 
 echo "Environment initated successfully! Run 'p10k configure' to configure powerlevel10k."
