@@ -22,5 +22,12 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plug
 # Install zsh & oh-my-zsh
 sudo apt install zsh -y
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+chsh -s $(which zsh)
 
-echo "Environment initated successfully!"
+# Install powerlevel10k
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+cp ~/.zshrc ~/.zshrc.bak
+echo 'source $HOME/powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
+source ~/.zshrc
+
+echo "Environment initated successfully! Run 'p10k configure' to configure powerlevel10k."
