@@ -1,0 +1,23 @@
+# Ignore Redis data directory
+data/
+
+# Ignore Redis configuration directory
+config/
+
+# Ignore Redis dump file
+dump.rdb
+
+# Ignore Redis append-only file
+appendonly.aof
+
+# Ignore Redis logs
+*.log
+
+# Ignore temporary files
+*.tmp
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+redisinsight/
