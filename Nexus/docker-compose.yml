@@ -1,0 +1,15 @@
+services:
+  nexus:
+    container_name: nexus
+    platform: linux/amd64
+    image: sonatype/nexus3:latest
+    ports:
+      - ${NEXUS_PORT:-8081}:8081
+      - ${NEXUS_HEALTH_PORT:-8085}:8085
+    volumes:
+      - ./nexus-data:/nexus-data
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1024M
