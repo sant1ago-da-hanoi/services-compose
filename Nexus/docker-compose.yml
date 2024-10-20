@@ -8,6 +8,7 @@ services:
       - ${NEXUS_HEALTH_PORT:-8085}:8085
     volumes:
       - ./nexus-data:/nexus-data
+    user: "200:200"
     deploy:
       resources:
         limits:
