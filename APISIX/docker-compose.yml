@@ -1,0 +1,63 @@
+x-001: &merged-conf
+  logging:
+    driver: json-file
+    options:
+      max-size: 10m
+      max-file: "3"
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+
+services:
+  apisix-dashboard:
+    container_name: apisix-dashboard
+    platform: linux/amd64
+    image: apache/apisix-dashboard:3.0.1-alpine
+    restart: always
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./dashboard_conf/conf.yaml:/usr/local/apisix-dashboard/conf/conf.yaml
+  apisix:
+    container_name: apisix-core
+    platform: linux/amd64
+    image: apache/apisix:3.11.0-debian
+    restart: always
+    volumes:
+      - ./apisix_conf/config.yaml:/usr/local/apisix/conf/config.yaml:ro
+    depends_on:
+      - etcd
+    ports:
+      - "9080:9080"
+    <<: *merged-conf
+  etcd:
+    container_name: apisix-etcd
+    platform: linux/amd64
+    image: bitnami/etcd:3.5.16
+    restart: always
+    environment:
+      ETCD_ENABLE_V2: "true"
+      ALLOW_NONE_AUTHENTICATION: "yes"
+      ETCD_ADVERTISE_CLIENT_URLS: "http://etcd:2379"
+      ETCD_LISTEN_CLIENT_URLS: "http://0.0.0.0:2379"
+    volumes:
+      - etcd_data:/bitnami/etcd
+    <<: *merged-conf
+  # prometheus:
+  #   image: prom/prometheus:v2.25.0
+  #   restart: always
+  #   volumes:
+  #     - ./prometheus_conf/prometheus.yml:/etc/prometheus/prometheus.yml
+  #   <<: *merged-conf
+  # grafana:
+  #   image: grafana/grafana:7.3.7
+  #   restart: always
+  #   ports:
+  #     - "13000:3000"
+  #   volumes:
+  #     - ./grafana_conf/provisioning:/etc/grafana/provisioning
+  #     - ./grafana_conf/dashboards:/var/lib/grafana/dashboards
+  #     - ./grafana_conf/config/grafana.ini:/etc/grafana/grafana.ini
+  #   <<: *merged-conf
+volumes:
+  etcd_data:
+    driver: local
