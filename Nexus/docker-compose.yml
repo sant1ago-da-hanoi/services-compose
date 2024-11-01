@@ -12,5 +12,6 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
-          memory: 1536M
+          cpus: ${CPU_LIMIT:-1}
+          memory: ${MEM_LIMIT:-1G}
+    restart: always
