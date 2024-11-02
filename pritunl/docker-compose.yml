@@ -1,0 +1,26 @@
+services:
+  pritunl:
+    container_name: pritunl
+    platform: linux/amd64
+    image: ghcr.io/jippi/docker-pritunl
+    restart: unless-stopped
+    privileged: true
+    dns:
+      - 127.0.0.1
+    volumes:
+      - "./data/pritunl.conf:/etc/pritunl.conf"
+      - "./data/pritunl:/var/lib/pritunl"
+      - "./data/mongodb:/var/lib/mongodb"
+      - ${SSL_KEY}:/var/lib/pritunl/pritunl.key
+      - ${SSL_CRT}:/var/lib/pritunl/pritunl.crt
+    ports:
+      - "1024:80"
+      - "2048:443"
+      - "1194:1194"
+      - "1194:1194/udp"
+    networks:
+      - pritunl
+
+networks:
+  pritunl:
+    driver: bridge
