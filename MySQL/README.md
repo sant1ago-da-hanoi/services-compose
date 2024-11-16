@@ -7,5 +7,5 @@
 
 ## Usage
 
-- PostgreSQL port: `5432`
-- PGAdmin port: `5050`
+- MySQL port: `3306`
+- PHPMyAdmin port: `9091`

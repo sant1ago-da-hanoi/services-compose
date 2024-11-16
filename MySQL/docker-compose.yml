@@ -1,8 +1,6 @@
-version: '3.8'
-
 services:
   mysql:
-    image: mysql:8.2
+    image: mysql:8.4
     platform: linux/amd64
     container_name: dev_mysql
     restart: always
@@ -12,16 +10,29 @@ services:
       - ./data/db:/var/lib/mysql
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-db}
-      MYSQL_USER: ${MYSQL_USER:-root}
+      MYSQL_USER: ${MYSQL_USER:-admin}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-root}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+    networks:
+      - net
 
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: dev_phpmyadmin
+    image: phpmyadmin/phpmyadmin:latest
+    platform: linux/amd64
+    container_name: dev_pma
     restart: always
     ports:
       - ${PHPMYADMIN_PORT:-9091}:80
     environment:
       PMA_HOST: mysql
-      PMA_PORT: 3306
+      PMA_PORT: ${MYSQL_PORT:-3306}
+      PMA_ABSOLUTE_URI: ${PMA_ABSOLUTE_URI:-http://localhost:${PHPMYADMIN_PORT:-9091}}
+      PMA_COOKIE_SAMESITE: Lax
+    depends_on:
+      - mysql
+    networks:
+      - net
+
+networks:
+  net:
+    driver: bridge
